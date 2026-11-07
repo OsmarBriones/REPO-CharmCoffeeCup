@@ -20,3 +20,12 @@ Energy is a local number on `PlayerController`, so no patch and no network traff
 - Looked up by exact prefab name; a game update that renames the prefab needs a mod update.
 - The effect checks energy once per frame; a single frame at zero energy is possible before it triggers and the vanilla sprint check fails that frame.
 - Only the Arctic Coffee Cup exists today.
+
+## Runtime hygiene
+
+- **References and level state:** nothing needed. The mod keeps no per-level state: `SecondWind` has no fields besides its charm, and nothing static holds a game object.
+- **Per-frame work:** `SecondWind.Update` returns on the first line while the charm is inactive and allocates nothing in either state (no LINQ, collections or string building).
+- **Debug logs:** fixed. The one `LogDebug` inside `Update` (energy restored) is now guarded with `if (Charm.DebugMode)`.
+- **Changes to the game:** nothing needed. The only write is a one-time energy refill when the energy hits zero; there is nothing to restore.
+- **Static game objects and Find calls:** none.
+- Known limit outside this mod: while the charm is active, CharmCore's `IsActive` and `CharmSetting.Value` build their host-setting key strings on each call; that is CharmCore's code and was left alone.
