@@ -2,6 +2,9 @@
 
 Deploy: Pockets, CharmCore and CharmCoffeeCup are in the r2modman `Debug` profile (hashes match the builds). Restart the game first.
 
+## Quick start with debug mode
+Set `DebugMode = true` in the `Debug` section of `BepInEx/config/com.osmar.CharmCoffeeCup.cfg` (off by default). When a level starts, a Coffee Cup is placed on the floor about 2.5 m in front of you; the log then also shows the detailed lines (`Carrying`, `Used`, `Wear ...`, `After wear ...`, `Second Wind: energy restored`). Any level works.
+
 ## Single player
 - [ ] Log shows `Charm registered: Coffee Cup - Second Wind` and `CharmCore 1.0.0 loaded!`.
 - [ ] Find the Coffee Cup (Arctic levels), store it in a slot. The slot shows its picture and value.

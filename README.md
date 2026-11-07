@@ -35,6 +35,8 @@ Settings are in `com.osmar.CharmCoffeeCup.cfg` inside `BepInEx/config`, section 
 - `CooldownSeconds` (default `3`): pause between uses. `0` means none.
 - `RestorePercent` (default `30`): share of your maximum energy that comes back.
 
+Section `Debug`: `DebugMode` (default `false`) places a Coffee Cup on the floor in front of you when a level starts (host or singleplayer) and writes extra log lines. For testing.
+
 ## Issues & Bug Reports
 The official way to report issues, suggest improvements, or submit feedback is by opening an issue on the official GitHub repository:
 👉 [GitHub Issues](https://github.com/OsmarBriones/REPO-CharmCoffeeCup/issues)

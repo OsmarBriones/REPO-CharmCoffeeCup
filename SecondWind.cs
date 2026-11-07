@@ -26,7 +26,7 @@ namespace CharmCoffeeCup
 			if (Charm.TryUse())
 			{
 				player.EnergyCurrent = player.EnergyStart * (Charm.RestorePercent.Value / 100f);
-				CharmCoffeeCupPlugin.Logger.LogInfo($"Second Wind: energy restored to {player.EnergyCurrent:0}");
+				Charm.LogDebug($"Second Wind: energy restored to {player.EnergyCurrent:0} of {player.EnergyStart:0}");
 			}
 		}
 	}
