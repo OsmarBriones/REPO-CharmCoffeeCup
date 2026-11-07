@@ -1,49 +1,22 @@
 # CharmCoffeeCup Architecture
 
-This document describes the runtime structure, data flow, and design decisions for this mod.
+A Charm mod (layer 3 of the PocketCharms family): one valuable, one power. It depends on **Pockets** (storage) and **CharmCore** (registry, wear, cooldown display, host settings).
 
----
+## The power: Second Wind
 
-## High-Level Concept
+The Coffee Cup valuable (prefab `Valuable Arctic Coffee Cup`) in the local player's pocket restores part of their energy the moment it reaches zero.
 
-Briefly summarize what this mod does:
-1. **Trigger / Hook:** What game event or lifecycle point triggers mod logic.
-2. **Authority / Networking:** Specify if logic runs host-only (singleplayer/master client) or on all clients.
-3. **Outcome:** What changes in the game (item spawned, enemy stunned, stats adjusted, etc.).
+- `CoffeeCupCharm : Charm` registers the prefab name, the defaults (wear 20%, cooldown 3 s) and one extra host-synced setting, `RestorePercent` (30).
+- `SecondWind` (a `MonoBehaviour` on the plugin object) runs every frame: if the charm is active and `PlayerController.instance.EnergyCurrent <= 0`, it calls `Charm.TryUse()`. When that returns true it sets `EnergyCurrent = EnergyStart * RestorePercent / 100`.
 
----
+Energy is a local number on `PlayerController`, so no patch and no network traffic is needed for the effect itself. Wear is requested through CharmCore (host applies it).
 
-## Main Data Flow
+## Game members used
 
-### 1. Level Start / Initialization
-- Entry point: `Patches/EnemyDirector_Start_Patch.cs` (Harmony patch on `EnemyDirector.Start`).
-- Checks `SemiFunc.RunIsLevel()` to ensure execution only in playable levels.
-- Refreshes configuration via `ConfigurationController.Reload()`.
-- Resets any per-level state or counters.
+`PlayerController.instance`, `PlayerController.EnergyCurrent`, `PlayerController.EnergyStart` (checked by `CharmCoffeeCup.Tests`).
 
-### 2. Gameplay Events & Patches
-- Place each Harmony patch in `Patches/<TargetType>_<TargetMethod>_Patch.cs`.
-- Follow the host-only pattern where applicable:
-  ```csharp
-  if (!SemiFunc.IsMasterClientOrSingleplayer()) return;
-  ```
+## Known limits
 
-### 3. Shared Library Usage (RepoAPI)
-- If the mod consumes shared logic (spawning items, item keys, reflection helpers), pull only the required modules via git submodule in `external/RepoAPI` and `<Compile Include>` in `.csproj`.
-- Never duplicate generic RepoAPI code locally.
-
----
-
-## Key Design Decisions & Invariants
-
-- **Standalone build:** This repository builds into a single self-contained DLL (`CharmCoffeeCup.dll`).
-- **Configuration reload:** Settings reload cleanly on level transition without requiring a game restart.
-
----
-
-## Testing Strategy
-
-Follows the 3-tier testing strategy in `external/RepoKit/REPO_MODS_METHODOLOGY.md` §8:
-1. **Tier 1 (Unit tests):** Decouple pure business logic and test via a companion test project (`dotnet test`).
-2. **Tier 2 (Harmony verification):** Verify that patch targets exist in `Assembly-CSharp.dll` before deploying.
-3. **Tier 3 (In-game smoke test / Optional debug triggers):** Default validation is done simply by launching the game and observing normal gameplay. Custom hotkeys/triggers are strictly optional and off by default, only used when mechanics are rare or difficult to reach naturally.
+- Looked up by exact prefab name; a game update that renames the prefab needs a mod update.
+- The effect checks energy once per frame; a single frame at zero energy is possible before it triggers and the vanilla sprint check fails that frame.
+- Only the Arctic Coffee Cup exists today.
